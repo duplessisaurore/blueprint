@@ -1,7 +1,7 @@
 //! Provider for basic package source related things
 //! which are essentially hooks into system package managers
 
-use std::fmt::Display;
+use std::{fmt::Display};
 
 use inquire::Confirm;
 use serde::Deserialize;
@@ -25,6 +25,11 @@ pub enum PackageSource {
     // for these packages
     #[serde(rename = "archlinux-pacman")]
     ArchPacman,
+
+    // Use the default config which will be resolved later as
+    // the source for these packages
+    #[serde(rename = "default")]
+    DefaultLater,
 }
 
 impl Display for PackageSource {
@@ -32,6 +37,7 @@ impl Display for PackageSource {
         match self {
             PackageSource::ArchParu => write!(f, "Arch-Linux using Paru"),
             PackageSource::ArchPacman => write!(f, "Arch-Linux using Pacman"),
+            PackageSource::DefaultLater => write!(f, "Default, resolved later"),
         }
     }
 }
@@ -72,6 +78,7 @@ impl PackageSource {
         match self {
             PackageSource::ArchParu => Ok(paru::remove_non_packages),
             PackageSource::ArchPacman => Ok(pacman::remove_non_packages),
+            PackageSource::DefaultLater => PackageSource::default().remove_all_non_packagelist(),
         }
     }
 
@@ -90,9 +97,10 @@ impl PackageSource {
             }
         }
 
-        Ok(match self {
-            PackageSource::ArchParu => paru::install_packages,
-            PackageSource::ArchPacman => pacman::install_packages,
-        })
+        match self {
+            PackageSource::ArchParu => Ok(paru::install_packages),
+            PackageSource::ArchPacman => Ok(pacman::install_packages),
+            PackageSource::DefaultLater => PackageSource::default().install_all_packagelist(),
+        }
     }
 }

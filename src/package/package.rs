@@ -21,12 +21,18 @@ pub struct Package {
     pub name: String,
 
     // Which source to use to apply this package?
-    #[serde(default)]
+     #[serde(default = "default_later")]
     pub source: PackageSource,
 
     // What file is this package defined in for debugging info
     #[serde(skip)]
     pub src: PathBuf,
+}
+
+/// Default function for package source for packages
+/// which will resolve them later when default_sources is set
+pub fn default_later() -> PackageSource {
+    return PackageSource::DefaultLater
 }
 
 /// Newtype to help handling packages better

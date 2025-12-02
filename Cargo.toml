@@ -1,6 +1,6 @@
 [package]
 name = "blueprint"
-version = "2.1.2"
+version = "2.2.2"
 edition = "2024"
 authors = ["Aurore du Plessis <aurore@sudlicht.com>"]
 description = "A file-based declarative system package management software"
