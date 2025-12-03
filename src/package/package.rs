@@ -21,8 +21,7 @@ pub struct Package {
     pub name: String,
 
     // Which source to use to apply this package?
-    #[serde(default)]
-    pub source: PackageSource,
+    pub source: Option<PackageSource>,
 
     // What file is this package defined in for debugging info
     #[serde(skip)]
@@ -51,7 +50,7 @@ impl DerefMut for PackageList {
 impl Package {
     /// Creates a new package representation from its components
     /// src file should be configured for debugging into from add_source_debug_path
-    pub fn new(name: String, source: PackageSource) -> Self {
+    pub fn new(name: String, source: Option<PackageSource>) -> Self {
         Self {
             name,
             source,
@@ -86,7 +85,7 @@ impl Display for Package {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "package {}, from source {}, referenced in configuration file {:?}",
+            "package {}, from source {:?}, referenced in configuration file {:?}",
             self.name, self.source, self.src
         )
     }
@@ -120,7 +119,7 @@ impl PackageList {
 
         // Split all of the packages based on their source.
         for current_package in &self.0 {
-            match source_map.entry(current_package.source) {
+            match source_map.entry(current_package.source.unwrap_or_else(|| PackageSource::default())) {
                 Entry::Occupied(mut occupied_entry) => {
                     // Existing entry, should ve a vec
                     occupied_entry.get_mut().push(current_package);

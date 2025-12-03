@@ -35,9 +35,8 @@ pub struct MultiplePackage {
     // A list of names of packages to install
     pub names: Vec<String>,
 
-    // Wher to source these packages?
-    #[serde(default)]
-    pub source: PackageSource,
+    // Where to source these packages?
+    pub source: Option<PackageSource>,
 }
 
 /// Is this link to another file (from origin_file) valid?
